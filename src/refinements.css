@@ -1,0 +1,102 @@
+.nav > a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 8px 0;
+}
+.utility a,
+.section-heading > a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: inherit;
+}
+.section-heading > a {
+  font-size: 12px;
+  font-weight: 800;
+}
+.category-emoji img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.promo-ar-copy {
+  position: absolute;
+  left: 3%;
+  top: 40%;
+  width: 50%;
+  background: #f48aad;
+  color: #fff;
+  text-align: right;
+  padding: 7px;
+  font-size: 12px;
+}
+.promo-ar-copy strong,
+.promo-ar-copy small {
+  display: block;
+}
+.promo-ar-copy small {
+  font-size: 8px;
+  margin-top: 7px;
+}
+.promo-orange .promo-ar-copy {
+  background: #faa36d;
+  color: #202b43;
+}
+.journal-page {
+  max-width: 750px;
+  margin: auto;
+}
+.journal-page h2 {
+  margin-top: 35px;
+}
+.logo {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+[dir="rtl"] .category-arrow {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+[dir="rtl"] .lucide-arrow-up-right {
+  transform: scaleX(-1);
+}
+@media print {
+  body:has(.invoice-dialog) * {
+    visibility: hidden;
+  }
+  body:has(.invoice-dialog) .invoice-dialog,
+  body:has(.invoice-dialog) .invoice-dialog * {
+    visibility: visible;
+  }
+  body:has(.invoice-dialog) .overlay {
+    position: absolute;
+    inset: 0;
+    background: white;
+    backdrop-filter: none;
+    display: block;
+  }
+  body:has(.invoice-dialog) .invoice-dialog {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+@media (max-width: 760px) {
+  .nav > a {
+    display: none;
+  }
+  .section-heading > a {
+    font-size: 9px;
+  }
+  .header-actions > .icon {
+    width: 29px;
+    height: 29px;
+  }
+}

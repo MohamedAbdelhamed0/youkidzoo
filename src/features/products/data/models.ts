@@ -1,0 +1,35 @@
+import type { Product } from "../domain/Product";
+export interface ProductDto {
+  id: string;
+  name_en: string;
+  name_ar: string;
+  category_id: string;
+  shop_id: string;
+  price: number;
+  stock_quantity: number;
+  emoji: string;
+  color: string;
+  sku: string;
+  description_en: string;
+  description_ar: string;
+  discount_price: number | null;
+  currency: string;
+  thumbnail_url: string;
+  gallery_urls: string[];
+  age_group: string | null;
+  gender_target: string | null;
+  brand: string;
+  material_en: string | null;
+  material_ar: string | null;
+  safety_warnings_en: string | null;
+  safety_warnings_ar: string | null;
+  dimensions: Product["dimensions"] | null;
+  is_featured: boolean;
+  is_special_deal: boolean;
+  special_deal_ends_at: string | null;
+  rating_average: number;
+  rating_count: number;
+  is_active: boolean;
+  created_at: string;
+  categories?: { name_en: string; name_ar?: string };
+}

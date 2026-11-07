@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+*.log
+supabase/.temp/
+.supabase-inspection/
+.deployment-local/

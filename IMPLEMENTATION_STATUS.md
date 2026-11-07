@@ -1,0 +1,25 @@
+# Completion audit
+
+Catalog update (2026-11-08): inspected the live catalog, then added the global bilingual Kids Clothing category and six starter clothes priced in EGP, preserving existing inventory. Local demo data and repeatable seed match the addition; `supabase/seeds/kids-clothing.sql` is the additive content script. Sizes are descriptive, one size per product; illustrations and stock are samples. All 57 application tests and the production build passed. Live SQL confirmed the six records and preserved user product; the public API verification attempt timed out on its network connection.
+
+This tracks the full supplied architecture specification and the user's current cash-on-delivery-only payment scope. Items are complete only to the verification level stated here. The project is **not yet verified complete**: backend deployment and live workflow checks now pass, while browser visual/responsive and release checks remain.
+
+| Requirement | Current evidence | Remaining gate |
+| --- | --- | --- |
+| React/TypeScript application and production build | Vite app, typed source, lazy page bundles | Final build after every functional change |
+| Homepage layout, colors, categories, banners and countdown | Redesigned landing section with generated lifestyle photography, bilingual copy, clothing/toy shopping links, actual starting prices, COD/shipping information, catalog-driven expiry | Real-browser desktop/mobile visual audit |
+| English/Arabic and RTL/LTR | Persisted language, bilingual entity data, translated screens/statuses/filter labels, localized validation/service errors, Arabic workflow and direction-switch tests | Visual RTL audit and real-browser native-input review |
+| Multi-shop catalog and category hierarchy | Shop/category repositories, shop/category routes, adopted categories, descendant filtering, SQL cycle/scope checks | Connected-project category/shop CRUD, reads and assignments passed |
+| Product attributes and galleries | Product DTO/domain mapping, admin forms including dimensions/material/safety/age/deals, Storage upload adapter | Live image upload, public image fetch, gallery persistence and denied customer uploads passed; starter inventory remains sample content |
+| Repository/data-source/controller architecture | Pure domain contracts; explicit datasource interfaces/adapters; injected repositories; controllers for feature workflows; passing dependency-boundary and alternative-backend tests | Source-level gates pass; live Supabase behavior remains a separate gate |
+| Registration, email and username login, roles | Supabase Auth repository, profile trigger, username Edge Function, role guards, route tests | Both login methods passed live fixture checks; the user-designated account is email-confirmed and has administrator access |
+| Cart and wishlist | Persistent validated state; stock cap; unavailable-item removal; workflow tests | Browser reload/responsive check against live catalog |
+| COD checkout | Server price calculation, discount expiry, EGP 100 shipping threshold, stock locks, snapshots, retry IDs, SQL and React tests | Live checks passed for EGP COD orders, request idempotency and competing checkouts for the final unit |
+| Order history and fulfillment | RLS-protected reads, customer history, allowed status transitions, cancellation restoration, delivery payment recording | Live customer isolation, fulfillment, refund ledger states and cancellation stock restoration passed |
+| Admin overview/products/categories/shops | Role guard, CRUD adapters/forms, category assignment, metrics, React admin workflow tests | Live administrator CRUD and denied customer privileges passed; user-designated administrator enabled |
+| Admin orders/invoice/payments | Status filter/update, invoice view/print CSS, COD ledger and localized statuses | Live ledger and status transitions passed; browser invoice-print check remains |
+| Cloud database/Auth/Storage configuration | Six migrations applied to the inspected target project; public app configuration, starter seed, image bucket and username function deployed | Deployment verified; future production-domain redirects must be configured when hosting changes |
+| Automated verification | SQL policy/workflow tests and simulated-DOM React workflows, including landing clothing navigation and bilingual headings | 58 local tests and production build passed after landing redesign; 19 earlier live workflow checks passed; browser checks remain |
+| Production release | `dist/` build and setup documentation | Connected backend, real content, visual verification, and deployment target |
+
+The initially empty cloud project now contains the application schema, starter catalog, image bucket, login function and the user-designated administrator. Temporary verification accounts, orders, ledger records and images were removed. No real payment was collected. Privileged verification keys were kept only in process memory; the frontend contains a public publishable key. Online card/Apple Pay/wallet payments are intentionally deferred by the user's explicit payment choice.

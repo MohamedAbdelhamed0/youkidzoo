@@ -1,0 +1,11 @@
+project_id = "youkidzoo"
+
+[auth]
+site_url = "https://mohamedabdelhamed0.github.io/youkidzoo/"
+additional_redirect_urls = ["https://mohamedabdelhamed0.github.io/youkidzoo/account", "http://127.0.0.1:5173/account", "http://localhost:5173/account"]
+
+[auth.email]
+enable_confirmations = true
+
+[functions.username-login]
+verify_jwt = false
