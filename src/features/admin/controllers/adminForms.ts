@@ -22,7 +22,6 @@ export const schemas = {
     description_ar: optionalText,
     logo_url: url,
     cover_banner_url: url,
-    owner_id: emptyId,
     contact_email: z.union([z.literal(""), z.email()]),
     contact_phone: z.string().max(40),
     is_verified: flag,
@@ -148,12 +147,6 @@ export function fieldsFor(resource: Resource): Field[] {
       ...names,
       { name: "slug", en: "URL slug", ar: "رابط المتجر" },
       ...descriptions,
-      {
-        name: "owner_id",
-        en: "Owner user ID (optional)",
-        ar: "معرف المالك (اختياري)",
-        optional: true,
-      },
       { name: "logo_url", en: "Logo URL", ar: "رابط الشعار", optional: true },
       {
         name: "cover_banner_url",

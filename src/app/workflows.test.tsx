@@ -172,11 +172,24 @@ it("lets administrators create a shop through the validated editor", async () =>
     role: "admin",
   });
   vi.spyOn(container.adminRepository, "list").mockResolvedValue([]);
-  const save = vi.spyOn(container.adminRepository, "save").mockResolvedValue();
+  vi.spyOn(container.adminRepository, "searchUsers").mockResolvedValue([
+    {
+      id: customer.id,
+      username: customer.username,
+      full_name: customer.fullName,
+      email: customer.email,
+    },
+  ]);
+  const save = vi
+    .spyOn(container.adminRepository, "saveShop")
+    .mockResolvedValue();
   window.history.replaceState({}, "", "/admin/shops");
   render(<App />);
   await user.click(await screen.findByRole("button", { name: "Add new +" }));
   const dialog = screen.getByRole("dialog");
+  await user.click(
+    await within(dialog).findByRole("checkbox", { name: /Test Parent/ }),
+  );
   await user.type(
     within(dialog).getByRole("textbox", { name: "Name (English)" }),
     "Test Shop",
@@ -194,14 +207,13 @@ it("lets administrators create a shop through the validated editor", async () =>
   );
   await waitFor(() =>
     expect(save).toHaveBeenCalledWith(
-      "shops",
       expect.objectContaining({
         name_en: "Test Shop",
         name_ar: "متجر تجريبي",
         slug: "test-shop",
-        owner_id: null,
         is_active: true,
       }),
+      [customer.id],
       undefined,
     ),
   );
@@ -211,7 +223,9 @@ it("switches language and document direction together", async () => {
   const user = userEvent.setup();
   render(<App />);
   await user.click(screen.getByRole("button", { name: "العربية" }));
-  await screen.findByRole("heading", { name: "كل حاجة صغيرة، وراها ضحكة كبيرة." });
+  await screen.findByRole("heading", {
+    name: "كل حاجة صغيرة، وراها ضحكة كبيرة.",
+  });
   expect(document.documentElement.dir).toBe("rtl");
   expect(document.documentElement.lang).toBe("ar");
   expect(localStorage.getItem("ykz-language")).toBe("ar");
@@ -347,4 +361,170 @@ it("shows an Arabic service error when sign-in has no configured backend", async
     "textContent",
     "المتجر غير متصل حاليًا. يرجى المحاولة بعد تفعيل الخدمة.",
   );
+});
+
+it("shows an empty owner workspace and keeps admin routes restricted", async () => {
+  vi.mocked(authRepository.currentUser).mockResolvedValue({
+    ...customer,
+    role: "shop_owner",
+  });
+  vi.spyOn(container.adminRepository, "ownerRecords").mockResolvedValue([]);
+  const adminList = vi.spyOn(container.adminRepository, "list");
+  window.history.replaceState({}, "", "/owner/products");
+  const user = userEvent.setup();
+  render(<App />);
+  expect(await screen.findByText(/No shops assigned yet/)).toBeTruthy();
+  expect(
+    (screen.getByRole("button", { name: "Add new +" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(adminList).not.toHaveBeenCalled();
+  expect(screen.queryByRole("link", { name: "Dashboard" })).toBeNull();
+  await user.click(screen.getByRole("link", { name: "My shop products" }));
+  cleanup();
+  window.history.replaceState({}, "", "/admin/products");
+  render(<App />);
+  expect(
+    await screen.findByRole("heading", { name: "Access restricted" }),
+  ).toBeTruthy();
+});
+it("loads assigned products and filters category choices for the selected shop", async () => {
+  vi.mocked(authRepository.currentUser).mockResolvedValue({
+    ...customer,
+    role: "shop_owner",
+  });
+  const shop = "20000000-0000-4000-8000-000000000001";
+  vi.spyOn(container.adminRepository, "ownerRecords").mockImplementation(
+    async (resource) =>
+      resource === "shops"
+        ? [{ id: shop, name_en: "Assigned shoes", name_ar: "Assigned shoes" }]
+        : resource === "categories"
+          ? [
+              {
+                id: "30000000-0000-4000-8000-000000000001",
+                name_en: "Adopted global",
+                is_active: true,
+                shop_id: null,
+              },
+              {
+                id: "30000000-0000-4000-8000-000000000002",
+                name_en: "Unadopted global",
+                is_active: true,
+                shop_id: null,
+              },
+              {
+                id: "30000000-0000-4000-8000-000000000003",
+                name_en: "Shop category",
+                is_active: true,
+                shop_id: shop,
+              },
+              {
+                id: "30000000-0000-4000-8000-000000000004",
+                name_en: "Inactive category",
+                is_active: false,
+                shop_id: shop,
+              },
+            ]
+          : [],
+  );
+  vi.spyOn(container.adminRepository, "shopCategories").mockResolvedValue([
+    "30000000-0000-4000-8000-000000000001",
+  ]);
+  window.history.replaceState({}, "", "/owner/products");
+  render(<App />);
+  const user = userEvent.setup();
+  await waitFor(() =>
+    expect(
+      (screen.getByRole("button", { name: "Add new +" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false),
+  );
+  await user.click(screen.getByRole("button", { name: "Add new +" }));
+  const dialog = within(screen.getByRole("dialog"));
+  expect(
+    await dialog.findByRole("option", { name: "Adopted global" }),
+  ).toBeTruthy();
+  expect(dialog.getByRole("option", { name: "Shop category" })).toBeTruthy();
+  expect(dialog.queryByRole("option", { name: "Unadopted global" })).toBeNull();
+  expect(
+    dialog.queryByRole("option", { name: "Inactive category" }),
+  ).toBeNull();
+  expect(dialog.getByRole("option", { name: "Assigned shoes" })).toBeTruthy();
+});
+
+it("lets an owner create and delete products through the assigned-shop editor", async () => {
+  vi.mocked(authRepository.currentUser).mockResolvedValue({
+    ...customer,
+    role: "shop_owner",
+  });
+  const shop = "20000000-0000-4000-8000-000000000001",
+    category = "30000000-0000-4000-8000-000000000001";
+  vi.spyOn(container.adminRepository, "ownerRecords").mockImplementation(
+    async (resource) =>
+      resource === "shops"
+        ? [{ id: shop, name_en: "Assigned", name_ar: "Assigned" }]
+        : resource === "categories"
+          ? [
+              {
+                id: category,
+                name_en: "Shoes",
+                name_ar: "Shoes",
+                is_active: true,
+                shop_id: shop,
+              },
+            ]
+          : [
+              {
+                id: "product",
+                name_en: "Hidden shoes",
+                name_ar: "Hidden shoes",
+                is_active: false,
+              },
+            ],
+  );
+  vi.spyOn(container.adminRepository, "shopCategories").mockResolvedValue([]);
+  const save = vi
+    .spyOn(container.adminRepository, "saveOwnerProduct")
+    .mockResolvedValue();
+  const remove = vi
+    .spyOn(container.adminRepository, "removeOwnerProduct")
+    .mockResolvedValue();
+  window.history.replaceState({}, "", "/owner/products");
+  render(<App />);
+  const user = userEvent.setup();
+  await screen.findByText("Hidden shoes");
+  await user.click(screen.getByRole("button", { name: "Add new +" }));
+  const dialog = within(screen.getByRole("dialog"));
+  await user.type(
+    dialog.getByRole("textbox", { name: "Name (English)" }),
+    "New shoes",
+  );
+  await user.type(
+    dialog.getByRole("textbox", { name: "Name (Arabic)" }),
+    "New shoes Arabic",
+  );
+  await user.type(dialog.getByRole("textbox", { name: "SKU" }), "OWNER-NEW");
+  await user.selectOptions(
+    dialog.getByRole("combobox", { name: "Category" }),
+    category,
+  );
+  await user.click(dialog.getByRole("button", { name: "Save changes" }));
+  await waitFor(() =>
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        shop_id: shop,
+        category_id: category,
+        sku: "OWNER-NEW",
+      }),
+      undefined,
+    ),
+  );
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  await user.click(screen.getByRole("button", { name: "Delete" }));
+  await user.click(
+    within(screen.getByRole("alertdialog")).getByRole("button", {
+      name: "Delete permanently",
+    }),
+  );
+  await waitFor(() => expect(remove).toHaveBeenCalledWith("product"));
 });

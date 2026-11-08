@@ -89,9 +89,24 @@ export function AdminOverview() {
     </>
   );
 }
-export function ResourceManager({ resource }: { resource: Resource }) {
+export function ResourceManager({
+  resource,
+  owner = false,
+}: {
+  resource: Resource;
+  owner?: boolean;
+}) {
   const { ar, t } = useLanguage();
   const {
+    ownerUsers,
+    setOwnerUsers,
+    ownerResults,
+    ownerQuery,
+    setOwnerQuery,
+    productShop,
+    setProductShop,
+    availableCategories,
+    categoryLoading,
     rows,
     shops,
     categories,
@@ -118,7 +133,7 @@ export function ResourceManager({ resource }: { resource: Resource }) {
     assignCategories,
     saveAssignments,
     uploadImages,
-  } = useResourceManagerController(resource);
+  } = useResourceManagerController(resource, owner);
   useDialogAccessibility(
     editing !== undefined || Boolean(remove) || Boolean(assigning),
     () => {
@@ -134,10 +149,22 @@ export function ResourceManager({ resource }: { resource: Resource }) {
     <>
       <div className="section-heading">
         <h1>{t(labels[1], labels[2])}</h1>
-        <button className="pink-button" onClick={() => open(null)}>
+        <button
+          className="pink-button"
+          disabled={owner && (loading || !shops.length)}
+          onClick={() => void open(null)}
+        >
           {t("Add new +", "إضافة +")}
         </button>
       </div>
+      {owner && !loading && !shops.length && (
+        <p>
+          {t(
+            "No shops assigned yet. Ask a super admin to assign a shop.",
+            "لم يتم تعيين متاجر بعد. اطلب من المسؤول تعيين متجر لك.",
+          )}
+        </p>
+      )}
       <input
         className="admin-search"
         aria-label={t("Search records", "بحث السجلات")}
@@ -185,7 +212,7 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                   </td>
                   <td>
                     <div className="table-actions">
-                      <button onClick={() => open(row)}>
+                      <button onClick={() => void open(row)}>
                         {t("Edit", "تعديل")}
                       </button>
                       {resource === "shops" && (
@@ -238,6 +265,47 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                 void save(Object.fromEntries(new FormData(e.currentTarget)));
               }}
             >
+              {resource === "shops" && (
+                <fieldset>
+                  <legend>{t("Shop owners", "مالكو المتجر")}</legend>
+                  <label>
+                    {t(
+                      "Search registered users",
+                      "البحث عن المستخدمين المسجلين",
+                    )}
+                    <input
+                      value={ownerQuery}
+                      onChange={(e) => setOwnerQuery(e.target.value)}
+                    />
+                  </label>
+                  {ownerUsers.map((u) => (
+                    <label className="radio-label" key={u.id}>
+                      <input
+                        type="checkbox"
+                        checked
+                        onChange={() =>
+                          setOwnerUsers((old) =>
+                            old.filter((x) => x.id !== u.id),
+                          )
+                        }
+                      />
+                      {u.full_name || u.username} ({u.email})
+                    </label>
+                  ))}
+                  {ownerResults
+                    .filter((u) => !ownerUsers.some((x) => x.id === u.id))
+                    .map((u) => (
+                      <label className="radio-label" key={u.id}>
+                        <input
+                          type="checkbox"
+                          checked={false}
+                          onChange={() => setOwnerUsers((old) => [...old, u])}
+                        />
+                        {u.full_name || u.username} ({u.email})
+                      </label>
+                    ))}
+                </fieldset>
+              )}
               {fieldsFor(resource).map((field) => {
                 let options = field.options?.map((option) => ({
                   ...option,
@@ -254,7 +322,9 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                   options = (
                     field.name === "shop_id"
                       ? shops
-                      : categories.filter((c) => c.id !== editing?.id)
+                      : resource === "products"
+                        ? availableCategories
+                        : categories.filter((c) => c.id !== editing?.id)
                   ).map((c) => ({
                     value: c.id,
                     label: String(c[ar ? "name_ar" : "name_en"]),
@@ -317,7 +387,30 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                     ) : field.type === "select" ? (
                       <select
                         name={field.name}
-                        defaultValue={String(value)}
+                        defaultValue={
+                          field.name === "shop_id" && resource === "products"
+                            ? undefined
+                            : String(value)
+                        }
+                        value={
+                          field.name === "shop_id" && resource === "products"
+                            ? productShop
+                            : undefined
+                        }
+                        key={
+                          field.name === "category_id"
+                            ? productShop +
+                              options?.map((o) => o.value).join(",")
+                            : field.name
+                        }
+                        onChange={
+                          field.name === "shop_id" && resource === "products"
+                            ? (e) => setProductShop(e.target.value)
+                            : undefined
+                        }
+                        disabled={
+                          field.name === "category_id" && categoryLoading
+                        }
                         required={!field.optional}
                       >
                         <option value="">{t("Select…", "اختر…")}</option>
@@ -389,7 +482,7 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                       type="file"
                       multiple
                       accept="image/jpeg,image/png,image/webp,image/avif"
-                      disabled={busy}
+                      disabled={busy || (owner && !productShop)}
                       onChange={async (e) => {
                         const input = e.currentTarget;
                         const files = Array.from(input.files || []);
@@ -411,7 +504,10 @@ export function ResourceManager({ resource }: { resource: Resource }) {
                   <ErrorText message={error} />
                 </p>
               )}
-              <button disabled={busy} className="pink-button">
+              <button
+                disabled={busy || categoryLoading}
+                className="pink-button"
+              >
                 {busy
                   ? t("Saving…", "جارٍ الحفظ…")
                   : t("Save changes", "حفظ التغييرات")}

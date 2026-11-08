@@ -49,13 +49,13 @@ To publish later edits, commit them and run `git push origin main`. Deployment p
 - Email/password and username/password authentication, registration, profile editing, sign-out, protected checkout, and customer order history.
 - COD checkout with server-calculated prices and shipping (EGP 7, free at EGP 100), stock reservation, order-item snapshots, payment recording, and idempotent retries.
 - Protected administration: overview metrics; product/category/shop creation, editing and deletion; bilingual fields; product dimensions; image galleries; category assignment; fulfillment status changes; invoice printing; and payment ledger.
-- Database RLS, isolated customer records, admin authorization, category ownership/hierarchy checks, and admin-only image uploads.
+- Database RLS, isolated customer records, admin authorization, category ownership/hierarchy checks, and admin and assigned-owner image uploads.
 
 With no Supabase configuration, the public catalog uses the sample inventory in `src/shared/data/demo-data.json`. Authentication and order placement require a connected backend; the app does not simulate successful accounts or orders.
 
 ## Connect Supabase
 
-Target project: `smbwbpgzvbujsrpoekbd` ([dashboard](https://supabase.com/dashboard/project/smbwbpgzvbujsrpoekbd)). The project was inspected before deployment: it had no public tables, Auth users, or storage data. Authenticated Supabase CLI access was available even though MCP tools were not exposed in the chat. Six migrations are now applied, the starter catalog is loaded, the username-login function is deployed, and the user-designated confirmed administrator is enabled. `.env.local` contains only the public project URL and publishable application key; it is ignored by Git.
+Target project: `smbwbpgzvbujsrpoekbd` ([dashboard](https://supabase.com/dashboard/project/smbwbpgzvbujsrpoekbd)). The project was inspected before deployment: it had no public tables, Auth users, or storage data. Authenticated Supabase CLI access was available even though MCP tools were not exposed in the chat. Seven migrations are now applied, the starter catalog is loaded, the username-login function is deployed, and the user-designated confirmed administrator is enabled. `.env.local` contains only the public project URL and publishable application key; it is ignored by Git.
 
 1. Use a new Supabase development project. Copy `.env.example` to `.env.local` and fill in its public project URL and anon/publishable key. Never put a service-role key in a Vite environment variable.
 2. Apply **all** migrations in filename order:
@@ -101,3 +101,11 @@ The database security advisor reports no exposed security-definer API functions 
 The landing section uses an original AI-generated lifestyle image, crisp bilingual copy, clothing/toy collection links, COD/shipping information, and an offer countdown driven by catalog expiry. See `public/images/GENERATION.md` for the image prompt and provenance. Clothing starting prices are calculated from available catalog products. Product illustrations and inventory remain samples. A real-browser visual/responsive audit is still outstanding because browser control was previously stopped by its URL-verification safeguard.
 
 See `IMPLEMENTATION_STATUS.md` for the remaining completion gates.
+
+
+## Shop owners
+
+Apply `20261108153358_shop_owners.sql` before deploying the updated frontend. In **Admin > Shops**, create or edit a shop and select existing registered users under **Shop owners**. Multiple users and multiple shops are supported; selected customers become shop owners automatically. Owners open **My shop products** from their account or navigation to manage products only for their assigned shops. Removing an assignment revokes its product and image write permissions immediately. A shop owner without assignments sees an empty workspace. Existing admins retain full access.
+
+
+Verification: `npm test` includes assignment and permission tests; `npm run build` checks the production bundle. Run `npm run test:live:owners -- --allow-temporary-fixtures` for the connected project Auth/database/storage workflow. This uses temporary identities and records, keeps credentials in memory, and removes fixtures afterward. The shop-owner migration and live workflow were verified against the connected project on November 8, 2026.

@@ -129,6 +129,15 @@ export function AdminRoute() {
     </div>
   );
 }
+export function OwnerRoute() {
+  const { user } = useAuthController();
+  const { t } = useLanguage();
+  return user?.role === "shop_owner" && user.isActive ? (
+    <Outlet />
+  ) : (
+    <h1>{t("Access restricted", "الوصول مقيد")}</h1>
+  );
+}
 export default function App() {
   const { t } = useLanguage();
   const refresh = useAuthController((s) => s.refresh);
@@ -162,6 +171,12 @@ export default function App() {
               <Route path="account" element={<AccountPage />} />
               <Route path="checkout" element={<CheckoutPage />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route element={<OwnerRoute />}>
+                <Route
+                  path="owner/products"
+                  element={<ResourceManager resource="products" owner />}
+                />
+              </Route>
               <Route element={<AdminRoute />}>
                 <Route path="admin" element={<AdminLayout />}>
                   <Route index element={<AdminOverview />} />

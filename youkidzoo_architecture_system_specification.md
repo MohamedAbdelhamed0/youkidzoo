@@ -239,7 +239,7 @@ Below are the comprehensive models tailored for **YouKidZoo**, including additio
 
 ```typescript
 // 1. USER ENTITY
-export type UserRole = 'user' | 'admin' | 'shop_manager';
+export type UserRole = 'user' | 'admin' | 'shop_owner';
 
 export interface User {
   id: string;
@@ -277,7 +277,7 @@ export interface Category {
 // 3. SHOP ENTITY
 export interface Shop {
   id: string;
-  ownerId: string;
+  // Ownership is managed privately through shop_owners assignments.
   slug: string;
   name: {
     en: string;
@@ -424,7 +424,7 @@ CREATE TABLE public.profiles (
   full_name TEXT,
   phone TEXT,
   avatar_url TEXT,
-  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin', 'shop_manager')),
+  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin', 'shop_owner')),
   preferred_language TEXT NOT NULL DEFAULT 'en' CHECK (preferred_language IN ('en', 'ar')),
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -433,7 +433,7 @@ CREATE TABLE public.profiles (
 -- 2. SHOPS TABLE
 CREATE TABLE public.shops (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  owner_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  owner_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL, -- Deprecated; shop_owners is authoritative
   slug TEXT UNIQUE NOT NULL,
   name_en TEXT NOT NULL,
   name_ar TEXT NOT NULL,
@@ -852,3 +852,19 @@ export function getLocalizedText(
    - Implement Username/Password authentication with role checking (`user` vs `admin`).
    - Build Cart, Checkout, Order creation, and Payment recording.
    - Build the protected `/admin` Dashboard for managing products, categories, shops, orders, and payments.
+
+## Shop-owner permissions (implemented November 2026)
+
+The existing `admin` account is the super admin. Registered customers can be assigned to shops through the bilingual owner selector in the shop create/edit form. Assignment promotes `user` accounts to `shop_owner` and preserves existing admins. The unused `shop_manager` role is migrated to `shop_owner`.
+
+`shop_owners(shop_id, user_id)` is the authoritative many-to-many assignment table. Its composite primary key prevents duplicate assignments, and a user-first index supports owner queries. The legacy `shops.owner_id` database column remains deprecated for migration compatibility and is not an authorization source or application field.
+
+`save_shop_with_owners(p_id uuid, p_shop jsonb, p_owners uuid[])` saves shop details, replaces assignments, and promotes selected active registered users in a single transaction. Only active admins can invoke the operation. Shops may have no owners. Removing all assignments leaves an owner account with an empty workspace.
+
+Owners use `/owner/products` to create, edit, and delete products, prices, stock, and galleries for assigned shops, including hidden products and inactive shops. Owner management queries explicitly filter assignments independently from public catalog queries. Category choices are active categories belonging to the selected shop plus active global categories adopted through `shop_categories`. Owners cannot edit shop settings, categories, user assignments, orders, or payment records; their normal customer access remains available.
+
+Database row-level policies check the current active profile, `shop_owner` role, and assignments. Product updates check both the existing and proposed shop. Owner uploads use `shops/<shop-id>/<random-file>` inside `store-images`; insert, update, and delete policies enforce current assignment access. Admin image paths and public image reads remain supported. Revocation and account deactivation take effect on subsequent requests without relying on token refresh. Public signup and profile editing cannot select privileged roles.
+
+Management contracts expose registered-user search, assignment retrieval, atomic shop saving, owner-scoped reads, product mutations, and shop-scoped image upload through controllers, repositories, and data sources. The public `IShopDataSource` remains dedicated to storefront browsing.
+
+Deploy the additive `shop_owners` migration before the updated frontend. Automated database tests cover legacy migration, many-to-many assignments, transaction rollback, product isolation, privilege escalation, storage paths, revocation, and inactive accounts. UI tests cover owner navigation, empty assignments, category filtering, and owner selection during shop creation.

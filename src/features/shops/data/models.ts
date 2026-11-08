@@ -1,6 +1,5 @@
 export interface ShopDto {
   id: string;
-  owner_id?: string | null;
   name_en: string;
   name_ar: string;
   slug: string;

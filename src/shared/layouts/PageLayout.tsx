@@ -21,6 +21,11 @@ export function PageLayout() {
           {user?.role === "admin" && (
             <Link to="/admin">{t("Dashboard", "لوحة التحكم")}</Link>
           )}
+          {user?.role === "shop_owner" && user.isActive && (
+            <Link to="/owner/products">
+              {t("My shop products", "منتجات متاجري")}
+            </Link>
+          )}
           <Link to="/cart">
             {t("Bag", "الحقيبة")} ({count})
           </Link>

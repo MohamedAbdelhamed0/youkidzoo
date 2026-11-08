@@ -2,6 +2,24 @@ import type { AdminRepository, Resource, ImageUpload } from "../domain/admin";
 import type { IAdminDataSource } from "./datasources/IAdminDataSource";
 export class AdminRepositoryImpl implements AdminRepository {
   constructor(private readonly source: IAdminDataSource) {}
+  searchUsers(query: string) {
+    return this.source.searchUsers(query);
+  }
+  shopOwners(shopId: string) {
+    return this.source.shopOwners(shopId);
+  }
+  saveShop(payload: Record<string, unknown>, owners: string[], id?: string) {
+    return this.source.saveShop(payload, owners, id);
+  }
+  ownerRecords(resource: Resource) {
+    return this.source.ownerRecords(resource);
+  }
+  saveOwnerProduct(payload: Record<string, unknown>, id?: string) {
+    return this.source.saveOwnerProduct(payload, id);
+  }
+  removeOwnerProduct(id: string) {
+    return this.source.removeOwnerProduct(id);
+  }
   list(resource: Resource) {
     return this.source.getRecords(resource);
   }
@@ -11,7 +29,7 @@ export class AdminRepositoryImpl implements AdminRepository {
   remove(resource: Resource, id: string) {
     return this.source.remove(resource, id);
   }
-  async upload(file: ImageUpload) {
+  async upload(file: ImageUpload, shopId?: string) {
     if (
       !["image/jpeg", "image/png", "image/webp", "image/avif"].includes(
         file.mimeType,
@@ -21,7 +39,7 @@ export class AdminRepositoryImpl implements AdminRepository {
       file.bytes.byteLength !== file.size
     )
       throw new Error("Use JPEG, PNG, WebP, or AVIF images up to 5 MB.");
-    return this.source.upload(file);
+    return this.source.upload(file, shopId);
   }
   shopCategories(shopId: string) {
     return this.source.getShopCategories(shopId);

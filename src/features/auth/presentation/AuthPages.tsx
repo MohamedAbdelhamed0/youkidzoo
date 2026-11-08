@@ -229,6 +229,11 @@ export function AccountPage() {
         <p role="status">{message}</p>
       </form>
       <div className="account-links">
+        {user?.role === "shop_owner" && user.isActive && (
+          <Link to="/owner/products">
+            {t("My shop products", "منتجات متاجري")}
+          </Link>
+        )}
         <Link to="/orders">{t("My orders", "طلباتي")}</Link>
         {user?.role === "admin" && (
           <Link to="/admin">{t("Admin dashboard", "لوحة الإدارة")}</Link>

@@ -1,6 +1,5 @@
 export interface Shop {
   id: string;
-  ownerId: string | null;
   name: { en: string; ar: string };
   slug: string;
   description: { en: string; ar: string };

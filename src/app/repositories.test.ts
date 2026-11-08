@@ -76,6 +76,12 @@ it("maps profile fields and reloads the authoritative profile after a save", asy
 });
 it("validates upload metadata before sending bytes to any backend", async () => {
   const source: IAdminDataSource = {
+    searchUsers: vi.fn(async () => []),
+    shopOwners: vi.fn(async () => []),
+    saveShop: vi.fn(async () => {}),
+    ownerRecords: vi.fn(async () => []),
+    saveOwnerProduct: vi.fn(async () => {}),
+    removeOwnerProduct: vi.fn(async () => {}),
     getRecords: vi.fn(async () => []),
     save: vi.fn(async () => {}),
     remove: vi.fn(async () => {}),

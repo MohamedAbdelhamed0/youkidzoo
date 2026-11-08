@@ -30,6 +30,7 @@ before(async () => {
     "202611070004_domain_invariants.sql",
     "202611070005_egp_currency.sql",
     "202611070006_guarded_rpc_surface.sql",
+    "20261108153358_shop_owners.sql",
   ]) {
     if (name === "202611070005_egp_currency.sql") {
       await db.exec(
@@ -417,7 +418,12 @@ test("profile changes cannot change roles; Auth email updates stay in sync", asy
   );
 });
 test("the development seed applies to the complete schema and can be run twice", async () => {
-  const catalog = JSON.parse(readFileSync(new URL("../../src/shared/data/demo-data.json", import.meta.url), "utf8"));
+  const catalog = JSON.parse(
+    readFileSync(
+      new URL("../../src/shared/data/demo-data.json", import.meta.url),
+      "utf8",
+    ),
+  );
   const seed = readFileSync(new URL("../seed.sql", import.meta.url), "utf8");
   await db.exec(seed);
   await db.exec(seed);

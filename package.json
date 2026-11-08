@@ -11,6 +11,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "seed:generate": "node scripts/generate-seed.mjs",
     "format": "prettier --write src scripts supabase/tests vite.config.ts tsconfig.json",
+    "test:live:owners": "node scripts/verify-live-shop-owners.mjs",
     "test:live:public": "node scripts/verify-live-public.mjs",
     "test:live:workflows": "node scripts/verify-live-workflows.mjs"
   },
