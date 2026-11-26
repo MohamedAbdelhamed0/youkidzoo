@@ -6,13 +6,37 @@
     <meta name="theme-color" content="#923e53" />
     <link rel="icon" href="%BASE_URL%favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="%BASE_URL%apple-touch-icon.png"
+    />
     <link rel="manifest" href="%BASE_URL%site.webmanifest" />
     <title>YouKidZoo — A little world of wonder</title>
     <meta
       name="description"
       content="Discover wonderful toys, little adventures, and everyday essentials for your family."
     />
+    <script>
+      if (
+        window.location.pathname === "%BASE_URL%" &&
+        !new URLSearchParams(window.location.search).has("__youkidzoo_route")
+      ) {
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "image";
+        preload.fetchPriority = "high";
+        preload.imageSrcset = [640, 1024, 1536]
+          .map(
+            (width) =>
+              `%BASE_URL%images/youkidzoo-joy-hero-${width}.webp ${width}w`,
+          )
+          .join(", ");
+        preload.imageSizes =
+          "(max-width: 760px) 90vw, max(46vw, calc(150svh - 170px))";
+        document.head.append(preload);
+      }
+    </script>
     <script src="%BASE_URL%restore-route.js"></script>
   </head>
   <body>

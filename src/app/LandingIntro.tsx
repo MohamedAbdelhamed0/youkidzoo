@@ -1,12 +1,22 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../core/i18n/i18n";
 import type { Category } from "../features/categories/domain/Category";
-import { categoryPhoto } from "../features/categories/presentation/categoryPhoto";
+import {
+  categoryPhoto,
+  categoryPhotoSrcSet,
+} from "../features/categories/presentation/categoryPhoto";
 import type { Product } from "../features/products/domain/Product";
 import {
   effectivePrice,
   formatMoney,
 } from "../features/products/domain/pricing";
+
+// Keep the homepage preload in index.html aligned with these image candidates.
+const heroAsset = `${import.meta.env.BASE_URL}images/youkidzoo-joy-hero`;
+const heroSources = [640, 1024, 1536]
+  .map((width) => `${heroAsset}-${width}.webp ${width}w`)
+  .join(", ");
+const heroSizes = "(max-width: 760px) 90vw, max(46vw, calc(150svh - 170px))";
 
 export function LandingIntro({
   home,
@@ -18,6 +28,7 @@ export function LandingIntro({
   const { ar, t } = useLanguage();
   const language = ar ? "ar" : "en";
   const photo = category && categoryPhoto(category);
+  const prioritize = home || Boolean(category);
   const description = category
     ? category.description[language]
     : t(
@@ -41,9 +52,9 @@ export function LandingIntro({
         {description && <p>{description}</p>}
       </div>
       <img
-        src={
-          photo || `${import.meta.env.BASE_URL}images/youkidzoo-joy-hero.png`
-        }
+        src={photo || `${heroAsset}-1024.webp`}
+        srcSet={category && photo ? categoryPhotoSrcSet(category) : heroSources}
+        sizes={heroSizes}
         alt={
           photo
             ? ""
@@ -54,7 +65,8 @@ export function LandingIntro({
         }
         width={photo ? undefined : 1536}
         height={photo ? undefined : 1024}
-        fetchPriority="high"
+        loading={prioritize ? "eager" : "lazy"}
+        fetchPriority={prioritize ? "high" : undefined}
       />
     </div>
   );

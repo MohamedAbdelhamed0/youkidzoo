@@ -2,7 +2,10 @@ import { useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../core/i18n/i18n";
 import { useProductController } from "../features/products/controllers/useProductController";
-import { categoryPhoto } from "../features/categories/presentation/categoryPhoto";
+import {
+  categoryPhoto,
+  categoryPhotoSrcSet,
+} from "../features/categories/presentation/categoryPhoto";
 import { ProductCard } from "../features/products/presentation/ProductCard";
 import {
   descendantIds,
@@ -98,6 +101,8 @@ export default function Storefront() {
                     {photo || remoteIcon ? (
                       <img
                         src={photo || category.iconUrl}
+                        srcSet={categoryPhotoSrcSet(category)}
+                        sizes="(max-width: 760px) 45vw, 25vw"
                         alt=""
                         loading="lazy"
                         decoding="async"
