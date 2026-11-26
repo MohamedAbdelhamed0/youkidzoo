@@ -12,6 +12,8 @@ import {
 } from "react-router-dom";
 import Storefront from "./Storefront";
 import { PageLayout } from "../shared/layouts/PageLayout";
+import { StoreLayout } from "../shared/layouts/StoreLayout";
+import { StoreInformation } from "../features/shops/presentation/StoreInformation";
 import {
   authRepository,
   useAuthController,
@@ -155,14 +157,17 @@ export default function App() {
         }
       >
         <Routes>
-          <Route path="/" element={<Storefront />} />
-          <Route element={<PageLayout />}>
-            <Route path="journal" element={<JournalPage />} />
+          <Route element={<StoreLayout />}>
+            <Route index element={<Storefront />} />
             <Route path="shop" element={<CatalogPage />} />
             <Route path="products/:id" element={<ProductPage />} />
             <Route path="categories/:slug" element={<CatalogPage />} />
             <Route path="shops" element={<ShopsPage />} />
             <Route path="shops/:slug" element={<CatalogPage />} />
+            <Route path="contact" element={<StoreInformation />} />
+          </Route>
+          <Route element={<PageLayout />}>
+            <Route path="journal" element={<JournalPage />} />
             <Route path="cart" element={<ShoppingBagPage />} />
             <Route path="wishlist" element={<ShoppingBagPage wishlist />} />
             <Route path="login" element={<AuthPage />} />

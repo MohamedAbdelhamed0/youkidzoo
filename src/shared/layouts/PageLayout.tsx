@@ -2,6 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import { useLanguage } from "../../core/i18n/i18n";
 import { useAuthController } from "../../features/auth/controllers/useAuthController";
 import { useCartController } from "../../features/cart/controllers/useCartController";
+import { Wordmark } from "./StoreLayout";
 export function PageLayout() {
   const { ar, t, setAr } = useLanguage();
   const user = useAuthController((s) => s.user);
@@ -11,9 +12,7 @@ export function PageLayout() {
   return (
     <>
       <header className="page-header">
-        <Link className="logo" to="/">
-          You<span>Kid</span>Zoo
-        </Link>
+        <Wordmark />
         <nav>
           <Link to="/shop">{t("Shop", "المتجر")}</Link>
           <Link to="/shops">{t("Our shops", "متاجرنا")}</Link>
@@ -39,9 +38,7 @@ export function PageLayout() {
         <Outlet />
       </div>
       <footer>
-        <Link className="logo" to="/">
-          YouKidZoo
-        </Link>
+        <Wordmark />
         <p>
           {t(
             "A little world of wonder. A whole lot of love.",

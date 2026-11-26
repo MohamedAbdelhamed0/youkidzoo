@@ -46,34 +46,28 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
-it("takes shoppers from the landing clothing button to the clothing collection", async () => {
-  const scroll = vi.fn();
-  vi.stubGlobal("scrollTo", vi.fn());
-  const original = Element.prototype.scrollIntoView;
-  Element.prototype.scrollIntoView = scroll;
-  try {
-    const user = userEvent.setup();
-    render(<App />);
-    await screen.findByRole("heading", { name: "Everyday Cotton T-Shirt" });
-    await user.click(
-      screen.getByRole("button", { name: "Explore kids clothing" }),
-    );
-    expect(screen.getByRole("heading", { name: "Kids Clothing" })).toBeTruthy();
-    expect(
-      screen.queryByRole("heading", { name: "Little Explorer Airplane" }),
-    ).toBeNull();
-    expect(scroll).toHaveBeenCalled();
-    expect(
-      screen
-        .getByRole("link", { name: "Shop the offers" })
-        .getAttribute("href"),
-    ).toBe("/shop?deals=true");
-  } finally {
-    Element.prototype.scrollIntoView = original;
-    vi.unstubAllGlobals();
-  }
+it("takes shoppers from a homepage category shortcut to its filtered catalog", async () => {
+  const user = userEvent.setup();
+  const { container } = render(<App />);
+  expect(
+    (await screen.findByRole("link", { name: "Shop the offers" })).getAttribute(
+      "href",
+    ),
+  ).toBe("/shop?deals=true");
+  const shortcut = await screen.findByRole("link", { name: "Kids Clothing" });
+  const photo = shortcut.querySelector("img")?.getAttribute("src");
+  expect(photo).toMatch(/kids-clothing\.webp/);
+  await user.click(shortcut);
+  await screen.findByRole("heading", { name: "Kids Clothing" });
+  await screen.findByRole("heading", { name: "Everyday Cotton T-Shirt" });
+  const hero = container.querySelector(".store-hero-category");
+  expect(hero?.querySelector("img")?.getAttribute("src")).toBe(photo);
+  expect(hero?.querySelector("strong")?.textContent).toBe("Kids Clothing");
+  expect(
+    screen.queryByRole("heading", { name: "Little Explorer Airplane" }),
+  ).toBeNull();
 });
-it("loads reference storefront categories, searches the real catalog, and adds to the bag", async () => {
+it("opens storefront categories, searches the catalog, saves a favorite, and adds to the bag", async () => {
   const user = userEvent.setup();
   render(<App />);
   expect(
@@ -81,20 +75,39 @@ it("loads reference storefront categories, searches the real catalog, and adds t
       name: "Little things. Big smiles.",
     }),
   ).toBeTruthy();
+  const menu = screen.getByRole("button", {
+    name: "Browse categories and links",
+  });
+  await user.click(menu);
+  const categoryList = screen.getByRole("navigation", {
+    name: "Browse the store",
+  });
   expect(
-    (await screen.findAllByRole("button", { name: /Babies/ })).length,
-  ).toBeGreaterThan(0);
-  await user.type(
-    screen.getByRole("textbox", { name: "Search products" }),
-    "Airplane",
-  );
+    await within(categoryList).findByRole("link", { name: "Baby Strollers" }),
+  ).toBeTruthy();
+  await user.keyboard("{Escape}");
+  expect(document.activeElement).toBe(menu);
+  expect(menu.getAttribute("aria-expanded")).toBe("false");
+  await user.click(screen.getByRole("button", { name: "Open search" }));
+  const search = screen.getByRole("searchbox", { name: "Search products" });
+  expect(document.activeElement).toBe(search);
+  await user.type(search, "Airplane");
   await user.click(screen.getByRole("button", { name: "Search" }));
-  await screen.findByRole("heading", { name: "Find their next favorite" });
-  await screen.findByRole("heading", { name: "Little Explorer Airplane" });
+  await screen.findByRole("heading", { name: "Shop all products" });
+  const product = await screen.findByRole("heading", {
+    name: "Little Explorer Airplane",
+  });
   expect(
     screen.queryByRole("heading", { name: "Cuddly Bunny Friend" }),
   ).toBeNull();
-  await user.click(screen.getByRole("button", { name: "Add +" }));
+  await user.click(screen.getByRole("button", { name: "Save to wishlist" }));
+  expect(screen.getByRole("link", { name: "Wishlist (1)" })).toBeTruthy();
+  await user.click(within(product).getByRole("link"));
+  await screen.findByRole("heading", {
+    name: "Little Explorer Airplane",
+    level: 1,
+  });
+  await user.click(screen.getByRole("button", { name: "Add to bag" }));
   expect(Object.values(useCartController.getState().cart)).toEqual([1]);
   await user.click(screen.getByRole("link", { name: "Bag (1)" }));
   expect(
@@ -229,6 +242,74 @@ it("switches language and document direction together", async () => {
   expect(document.documentElement.dir).toBe("rtl");
   expect(document.documentElement.lang).toBe("ar");
   expect(localStorage.getItem("ykz-language")).toBe("ar");
+});
+it("applies catalog filters only on confirmation and restores them when reopened", async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole("link", { name: "Filter and sort" }),
+  );
+  let dialog = await screen.findByRole("dialog", { name: "Filter and sort" });
+  await user.type(
+    within(dialog).getByRole("textbox", { name: "Search" }),
+    "Airplane",
+  );
+  await user.click(
+    within(dialog).getByRole("checkbox", { name: "In stock only" }),
+  );
+  expect(new URLSearchParams(window.location.search).has("q")).toBe(false);
+  await user.click(
+    within(dialog).getByRole("button", { name: "Show results" }),
+  );
+  await screen.findByRole("heading", { name: "Little Explorer Airplane" });
+  expect(
+    screen.queryByRole("heading", { name: "Cuddly Bunny Friend" }),
+  ).toBeNull();
+  expect(new URLSearchParams(window.location.search).get("available")).toBe(
+    "true",
+  );
+  await user.click(screen.getByRole("button", { name: "Filter and sort" }));
+  dialog = screen.getByRole("dialog", { name: "Filter and sort" });
+  expect(
+    (
+      within(dialog).getByRole("textbox", {
+        name: "Search",
+      }) as HTMLInputElement
+    ).value,
+  ).toBe("Airplane");
+  await user.click(
+    within(dialog).getByRole("button", { name: "Clear filters" }),
+  );
+  await user.keyboard("{Escape}");
+  expect(new URLSearchParams(window.location.search).get("q")).toBe("Airplane");
+});
+it("opens storefront information and lets a shopper copy their rated feedback", async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(screen.getByRole("link", { name: "Contact" }));
+  await screen.findByRole("heading", { name: "Store information" });
+  expect(
+    await screen.findByRole("link", { name: "Little Explorers" }),
+  ).toBeTruthy();
+  const trigger = screen.getByRole("button", { name: "Write feedback" });
+  await user.click(trigger);
+  const dialog = screen.getByRole("dialog", {
+    name: "How was your experience?",
+  });
+  await user.click(within(dialog).getByRole("button", { name: "Satisfied" }));
+  await user.type(
+    within(dialog).getByRole("textbox", { name: "Your feedback" }),
+    "Easy to browse",
+  );
+  await user.click(
+    within(dialog).getByRole("button", { name: "Copy feedback" }),
+  );
+  expect(await within(dialog).findByRole("status")).toBeTruthy();
+  expect(await navigator.clipboard.readText()).toBe(
+    "Rating: 4/5\n\nEasy to browse",
+  );
+  await user.keyboard("{Escape}");
+  expect(document.activeElement).toBe(trigger);
 });
 it("places a COD order, clears the bag, and shows its payment status in history", async () => {
   const user = userEvent.setup();

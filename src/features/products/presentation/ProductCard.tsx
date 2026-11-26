@@ -1,6 +1,7 @@
 import { formatMoney } from "../domain/pricing";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { useLanguage } from "../../../core/i18n/i18n";
 import { useCartController } from "../../cart/controllers/useCartController";
 import type { Product } from "../domain/Product";
@@ -9,14 +10,19 @@ export function ProductCard({ product: p }: { product: Product }) {
   const { ar, t } = useLanguage();
   const { add, wishes, setWishes, cart } = useCartController();
   const [added, setAdded] = useState(false);
+  const name = ar ? p.name_ar : p.name;
   return (
     <article className="product">
-      <div className="product-picture" style={{ background: p.color }}>
-        <Link className="product-art-link" to={`/products/${p.id}`}>
+      <div className="product-picture">
+        <Link
+          className="product-art-link"
+          to={`/products/${p.id}`}
+          aria-label={name}
+        >
           {p.thumbnailUrl ? (
-            <img src={p.thumbnailUrl} alt={ar ? p.name_ar : p.name} />
+            <img src={p.thumbnailUrl} alt="" loading="lazy" decoding="async" />
           ) : (
-            <span>{p.emoji}</span>
+            <span aria-hidden="true">{p.emoji}</span>
           )}
         </Link>
         <button
@@ -31,12 +37,12 @@ export function ProductCard({ product: p }: { product: Product }) {
             )
           }
         >
-          ♡
+          <Heart size={18} aria-hidden="true" />
         </button>
       </div>
       <p>{ar ? p.categoryNameAr || p.category : p.category}</p>
       <h3>
-        <Link to={`/products/${p.id}`}>{ar ? p.name_ar : p.name}</Link>
+        <Link to={`/products/${p.id}`}>{name}</Link>
       </h3>
       <div className="product-bottom">
         <strong>{formatMoney(effectivePrice(p), ar, p.currency)}</strong>

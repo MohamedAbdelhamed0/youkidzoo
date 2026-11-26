@@ -76,11 +76,7 @@ export function ShoppingBagPage({ wishlist = false }: { wishlist?: boolean }) {
       {message && <p role="status">{message}</p>}
       {items.map((p) => (
         <div className="bag-row" key={p.id}>
-          <Link
-            className="bag-emoji"
-            style={{ background: p.color }}
-            to={`/products/${p.id}`}
-          >
+          <Link className="bag-emoji" to={`/products/${p.id}`}>
             {p.thumbnailUrl ? <img src={p.thumbnailUrl} alt="" /> : p.emoji}
           </Link>
           <div>

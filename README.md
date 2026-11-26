@@ -53,6 +53,8 @@ To publish later edits, commit them and run `git push origin main`. Deployment p
 
 With no Supabase configuration, the public catalog uses the sample inventory in `src/shared/data/demo-data.json`. Authentication and order placement require a connected backend; the app does not simulate successful accounts or orders.
 
+Run `npm run dev:catalog` to open a separate sample storefront at `http://localhost:5174/`, even if your regular dev server is connected to Supabase. The preview includes one illustrated sample listing per category alongside the existing demo inventory. You can browse product details and try the local cart and wishlist.
+
 ## Connect Supabase
 
 Target project: `smbwbpgzvbujsrpoekbd` ([dashboard](https://supabase.com/dashboard/project/smbwbpgzvbujsrpoekbd)). The project was inspected before deployment: it had no public tables, Auth users, or storage data. Authenticated Supabase CLI access was available even though MCP tools were not exposed in the chat. Seven migrations are now applied, the starter catalog is loaded, the username-login function is deployed, and the user-designated confirmed administrator is enabled. `.env.local` contains only the public project URL and publishable application key; it is ignored by Git.

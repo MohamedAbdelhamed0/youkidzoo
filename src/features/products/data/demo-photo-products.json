@@ -1,0 +1,106 @@
+{
+  "babies": {
+    "name": "Sage Muslin Swaddle Set",
+    "ar": "طقم لفّ من الموسلين باللون الأخضر",
+    "desc": "Two lightweight muslin swaddles in sage and ivory.",
+    "descAr": "قطعتان خفيفتان من الموسلين باللونين الأخضر والعاجي.",
+    "price": 329,
+    "age": "0-6m"
+  },
+  "kids": {
+    "name": "Peach Canvas Mini Backpack",
+    "ar": "حقيبة ظهر صغيرة بلون الخوخ",
+    "desc": "A child-sized canvas backpack with a front zip pocket and carry handle.",
+    "descAr": "حقيبة ظهر قماشية للأطفال بجيب أمامي بسحّاب ومقبض للحمل.",
+    "price": 479,
+    "age": "4-6y"
+  },
+  "parents": {
+    "name": "Everyday Changing Tote",
+    "ar": "حقيبة يومية لمستلزمات الطفل",
+    "desc": "An oatmeal canvas tote with two handles and an exterior pocket.",
+    "descAr": "حقيبة قماشية بلون الشوفان بمقبضين وجيب خارجي.",
+    "price": 699,
+    "age": "all-ages"
+  },
+  "baby-bottles": {
+    "name": "Sage Baby Feeding Bottle",
+    "ar": "زجاجة رضاعة بغطاء أخضر",
+    "desc": "A clear glass feeding bottle with a sage grip sleeve.",
+    "descAr": "زجاجة رضاعة زجاجية شفافة بغطاء خارجي أخضر يسهل الإمساك به.",
+    "price": 249,
+    "age": "0-6m"
+  },
+  "pacifier": {
+    "name": "Peach and Sage Pacifier Duo",
+    "ar": "طقم لهايتين بالخوخي والأخضر",
+    "desc": "Two one-piece silicone pacifiers with easy-grip loop handles.",
+    "descAr": "لهايتان من السيليكون بقطعة واحدة ومقبضين حلقيين.",
+    "price": 179,
+    "age": "0-6m"
+  },
+  "baby-strollers": {
+    "name": "Sage Day Out Stroller",
+    "ar": "عربة نزهات للأطفال باللون الأخضر",
+    "desc": "A stroller with a sage canopy, padded seat, and lower storage basket.",
+    "descAr": "عربة أطفال بمظلة خضراء ومقعد مبطّن وسلة تخزين سفلية.",
+    "price": 4899,
+    "age": "6-12m"
+  },
+  "car-seats": {
+    "name": "Olive Buckle Car Seat",
+    "ar": "مقعد سيارة للأطفال بلون زيتوني",
+    "desc": "An olive and charcoal child car seat with a padded harness.",
+    "descAr": "مقعد سيارة للأطفال باللونين الزيتوني والفحمي مع حزام مبطّن.",
+    "price": 3999,
+    "age": "1-3y"
+  },
+  "education-toys": {
+    "name": "Oak Shape Sorter",
+    "ar": "صندوق الأشكال الخشبي",
+    "desc": "A wooden sorter with chunky pieces in sage, apricot, and yellow.",
+    "descAr": "صندوق فرز خشبي مع قطع كبيرة باللون الأخضر والمشمشي والأصفر.",
+    "price": 389,
+    "age": "1-3y"
+  },
+  "book-comic": {
+    "name": "The Little Fox Picture Book",
+    "ar": "كتاب الثعلب الصغير المصوّر",
+    "desc": "A wordless picture book about a fox exploring the woods.",
+    "descAr": "كتاب مصوّر بلا كلمات عن ثعلب يستكشف الغابة.",
+    "price": 219,
+    "age": "4-6y"
+  },
+  "gifts-sets": {
+    "name": "Welcome Baby Gift Box",
+    "ar": "صندوق هدايا للمولود",
+    "desc": "A keepsake box with a knit bear, a muslin cloth, and baby booties.",
+    "descAr": "صندوق هدايا يحتوي على دبدوب محبوك وقطعة موسلين وحذاء صغير.",
+    "price": 649,
+    "age": "0-6m"
+  },
+  "home-safety": {
+    "name": "Oak Doorway Safety Gate",
+    "ar": "بوابة أمان خشبية للممر",
+    "desc": "A light oak gate with vertical slats and a latch for a doorway.",
+    "descAr": "بوابة من خشب البلوط الفاتح بقضبان رأسية ومزلاج للممر.",
+    "price": 1899,
+    "age": "6-12m"
+  },
+  "memories-keepsakes": {
+    "name": "First Handprint Keepsake Kit",
+    "ar": "طقم تذكار بصمة اليد الأولى",
+    "desc": "A wooden memory box with a round clay handprint keepsake.",
+    "descAr": "صندوق ذكريات خشبي مع تذكار دائري من الطين لبصمة اليد.",
+    "price": 349,
+    "age": "0-6m"
+  },
+  "kids-clothing": {
+    "name": "Apricot Linen Overalls",
+    "ar": "سالوبيت كتّان مشمشي",
+    "desc": "Soft apricot overalls with button straps and two front pockets.",
+    "descAr": "سالوبيت مشمشي ناعم بحمالات بأزرار وجيبين أماميين.",
+    "price": 419,
+    "age": "4-6y"
+  }
+}

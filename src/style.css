@@ -1,10 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;800&display=swap");
 :root {
+  --store-ink: #27221f;
+  --store-muted: #635953;
+  --store-accent: #923e53;
+  --store-accent-hover: #773144;
+  --store-accent-soft: #f6e8eb;
+  --store-paper: #fcfaf7;
+  --store-surface: #fffdfb;
+  --store-surface-muted: #f1ebe5;
+  --store-footer: #f4eee8;
+  --store-line: #ded5cd;
+  --store-dark: #352921;
+  --store-scrim: #28221db5;
+  --store-danger: #a22743;
+  --store-display: Georgia, "Times New Roman", serif;
   font-family: Nunito, sans-serif;
-  color: #202b43;
-  background: #fff;
+  color: var(--store-ink);
+  background: var(--store-paper);
   font-synthesis: none;
   font-size: 14px;
+}
+:root[dir="rtl"] {
+  --store-display: Cairo, sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -21,6 +38,9 @@ button,
 input {
   font: inherit;
 }
+input {
+  accent-color: var(--store-accent);
+}
 button,
 a {
   color: inherit;
@@ -32,9 +52,11 @@ button {
 }
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
-  outline: 3px solid #e85287;
-  outline-offset: 4px;
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--store-accent);
+  outline-offset: 3px;
 }
 a {
   text-decoration: none;
@@ -259,7 +281,7 @@ main {
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 1.7px;
-  color: #75845a;
+  color: var(--store-accent);
 }
 .hero .eyebrow {
   display: none;
@@ -279,17 +301,21 @@ main {
   max-width: 280px;
 }
 .pink-button {
-  border-radius: 30px;
-  background: #ec6592;
+  border: 1px solid var(--store-accent);
+  border-radius: 4px;
+  background: var(--store-accent);
   color: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 19px;
   padding: 13px 27px;
-  font-size: 11px;
+  min-height: 44px;
+  font-size: 1rem;
   font-weight: 800;
-  box-shadow: 0 3px 0 #db54851a;
+}
+.pink-button:hover:not(:disabled) {
+  background: var(--store-accent-hover);
 }
 .dots {
   position: absolute;
@@ -535,33 +561,34 @@ h2 {
 footer {
   padding: 35px;
   text-align: center;
-  background: #fdf8f0;
+  background: var(--store-footer);
+  border-block-start: 1px solid var(--store-line);
 }
 footer .logo {
-  color: #79c7c6;
+  color: var(--store-ink);
 }
 footer .logo span {
-  color: #ecc56d;
+  color: var(--store-accent);
 }
 footer p {
   font-size: 12px;
-  color: #85838a;
+  color: var(--store-muted);
 }
 footer small {
   font-size: 10px;
-  color: #a39aa0;
+  color: var(--store-muted);
 }
 .overlay {
   position: fixed;
   inset: 0;
-  background: #24304466;
+  background: var(--store-scrim);
   z-index: 20;
   display: flex;
   justify-content: flex-end;
   backdrop-filter: blur(3px);
 }
 .dialog {
-  background: white;
+  background: var(--store-paper);
   width: 460px;
   max-width: 100%;
   height: 100%;
@@ -572,7 +599,7 @@ footer small {
 }
 .dialog > p {
   line-height: 1.9;
-  color: #777;
+  color: var(--store-muted);
 }
 .dialog h2 {
   font-size: 27px;
@@ -587,7 +614,7 @@ footer small {
   align-items: center;
   gap: 15px;
   padding: 23px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--store-line);
 }
 .bag-emoji {
   width: 70px;
@@ -596,6 +623,7 @@ footer small {
   place-items: center;
   font-size: 37px;
   border-radius: 9px;
+  background: var(--store-surface-muted);
 }
 .bag-row > div {
   flex: 1;
@@ -614,7 +642,7 @@ footer small {
 }
 .quantity button {
   padding: 3px;
-  border: 1px solid #eee;
+  border: 1px solid var(--store-line);
   border-radius: 4px;
   display: flex;
 }
@@ -626,7 +654,7 @@ footer small {
   justify-content: space-between;
 }
 .cart-total p {
-  color: #888;
+  color: var(--store-muted);
   font-size: 12px;
 }
 .cart-total .pink-button {
@@ -636,7 +664,7 @@ footer small {
 .empty {
   padding: 35px 0;
   line-height: 1.8;
-  color: #888;
+  color: var(--store-muted);
 }
 .empty button {
   display: block;
@@ -670,7 +698,7 @@ footer small {
   left: 50%;
   transform: translateX(-50%);
   z-index: 30;
-  background: #26364a;
+  background: var(--store-dark);
   color: white;
   box-shadow: 0 5px 25px #0002;
   border-radius: 14px;
@@ -1028,19 +1056,20 @@ footer small {
     transition: none !important;
   }
 }
+.page-header,
+.store-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+}
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 30px;
   padding: 26px 4%;
-  border-bottom: 1px solid #f0ebe8;
-}
-.page-header .logo {
-  color: #6ec9d4;
-}
-.page-header .logo span {
-  color: #ec719b;
+  background: var(--store-paper);
+  border-bottom: 1px solid var(--store-line);
 }
 .page-header nav {
   display: flex;
@@ -1050,7 +1079,7 @@ footer small {
   font-weight: 800;
 }
 .page-header nav button {
-  color: #d85887;
+  color: var(--store-accent);
 }
 .page-container {
   max-width: 1350px;
@@ -1062,7 +1091,14 @@ footer small {
   font-size: 36px;
   line-height: 1.35;
   margin: 10px 0 28px;
-  font-weight: 900;
+  font-weight: 400;
+}
+.page-container h1,
+.page-container h2 {
+  font-family: var(--store-display);
+}
+[dir="rtl"] .page-container h1 {
+  font-weight: 700;
 }
 .page-container h2 {
   font-size: 24px;
@@ -1074,9 +1110,9 @@ footer small {
   max-width: 470px;
   margin: 20px auto 50px;
   padding: 36px;
-  border: 1px solid #f1e8e9;
+  background: var(--store-surface);
+  border: 1px solid var(--store-line);
   border-radius: 16px;
-  box-shadow: 0 12px 45px #392d4a05;
 }
 .stack {
   display: flex;
@@ -1097,8 +1133,8 @@ footer small {
 .catalog-filters input,
 .catalog-filters select,
 .inline-label input {
-  border: 1px solid #e7e2e3;
-  background: #fff;
+  border: 1px solid var(--store-line);
+  background: var(--store-surface);
   border-radius: 8px;
   padding: 12px 14px;
   min-width: 0;
@@ -1112,10 +1148,10 @@ footer small {
 }
 .stack label small {
   font-weight: 400;
-  color: #888;
+  color: var(--store-muted);
 }
 .stack fieldset {
-  border: 1px solid #eee;
+  border: 1px solid var(--store-line);
   border-radius: 8px;
   padding: 18px;
 }
@@ -1133,7 +1169,7 @@ footer small {
   width: auto !important;
 }
 .form-error {
-  color: #b52854 !important;
+  color: var(--store-danger) !important;
   font-size: 12px;
 }
 .account-links {
@@ -1141,14 +1177,14 @@ footer small {
   flex-wrap: wrap;
   gap: 18px;
   margin-top: 25px;
-  color: #cf547e;
+  color: var(--store-accent);
   font-size: 12px;
 }
 .panel-card {
   padding: 25px;
-  border: 1px solid #eee5e7;
+  border: 1px solid var(--store-line);
   border-radius: 12px;
-  background: white;
+  background: var(--store-surface);
 }
 .checkout-grid {
   display: grid;
@@ -1158,7 +1194,7 @@ footer small {
 }
 .checkout-grid aside {
   position: sticky;
-  top: 25px;
+  inset-block-start: calc(78px + clamp(1.75rem, 3vw, 2.75rem));
 }
 .checkout-grid aside p b {
   float: inline-end;
@@ -1203,7 +1239,8 @@ footer small {
   margin: 15px 0;
 }
 .status-badge {
-  background: #fff0d8;
+  background: var(--store-accent-soft);
+  color: var(--store-accent);
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 11px;
@@ -1345,7 +1382,7 @@ button:disabled {
 }
 hr {
   border: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--store-line);
   margin: 20px 0;
 }
 @media (max-width: 760px) {
@@ -1440,8 +1477,8 @@ hr {
   font-weight: 800;
 }
 .admin-sidebar nav a.active {
-  color: #ca4c7e;
-  background: #fce8f0;
+  color: var(--store-accent);
+  background: var(--store-accent-soft);
 }
 .admin-content {
   min-width: 0;
@@ -1457,7 +1494,7 @@ hr {
 }
 .stat-grid small {
   font-size: 10px;
-  color: #888;
+  color: var(--store-muted);
 }
 .stat-grid strong {
   display: block;
@@ -1478,18 +1515,18 @@ th,
 td {
   text-align: start;
   padding: 15px 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--store-line);
   vertical-align: top;
 }
 th {
   font-weight: 800;
-  background: #fdf8f0;
+  background: var(--store-surface-muted);
   white-space: nowrap;
 }
 td small {
   display: block;
   font-size: 10px;
-  color: #999;
+  color: var(--store-muted);
   margin-top: 7px;
 }
 .table-actions {
@@ -1500,7 +1537,7 @@ td small {
 }
 .table-actions > button {
   font-size: 11px;
-  color: #d85483;
+  color: var(--store-accent);
 }
 .table-actions > .pink-button {
   color: white;
@@ -1508,14 +1545,16 @@ td small {
 .table-actions select,
 .admin-content > label select {
   font: inherit;
-  border: 1px solid #eee;
+  border: 1px solid var(--store-line);
   border-radius: 5px;
   padding: 5px;
   max-width: 160px;
-  background: white;
+  background: var(--store-surface);
 }
 .admin-search {
-  border: 1px solid #eee;
+  border: 1px solid var(--store-line);
+  background: var(--store-surface);
+  color: inherit;
   border-radius: 8px;
   padding: 12px 15px;
   width: 100%;
@@ -1542,7 +1581,7 @@ td small {
   width: 100%;
   border: 0;
   font-size: 10px;
-  color: #c44b76;
+  color: var(--store-accent);
 }
 .editor-dialog fieldset input[readonly] {
   font-size: 9px;

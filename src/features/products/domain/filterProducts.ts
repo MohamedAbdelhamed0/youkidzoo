@@ -21,6 +21,7 @@ export function filterProducts(
   params: URLSearchParams,
   shopId?: string,
   categoryId?: string,
+  language: "ar" | "en" = "en",
 ): Product[] {
   const query = (params.get("q") || "").trim().toLocaleLowerCase();
   const selected = params.get("category") || categoryId;
@@ -37,6 +38,7 @@ export function filterProducts(
       (!ids || Boolean(p.categoryId && ids.has(p.categoryId))) &&
       (!age || p.ageGroup === age) &&
       (!gender || p.genderTarget === gender) &&
+      (params.get("available") !== "true" || p.stock > 0) &&
       effectivePrice(p) <= max &&
       (params.get("deals") !== "true" || isActiveDeal(p)) &&
       `${p.name} ${p.name_ar} ${p.brand || ""}`
@@ -51,9 +53,20 @@ export function filterProducts(
     productsToShow = [...productsToShow].sort(
       (a, b) => effectivePrice(b) - effectivePrice(a),
     );
-  else if (sort === "newest")
-    productsToShow = [...productsToShow].sort((a, b) =>
-      (b.createdAt || "").localeCompare(a.createdAt || ""),
+  else if (sort === "newest" || sort === "oldest")
+    productsToShow = [...productsToShow].sort(
+      (a, b) =>
+        (sort === "newest" ? -1 : 1) *
+        (a.createdAt || "").localeCompare(b.createdAt || ""),
+    );
+  else if (sort === "name-asc" || sort === "name-desc")
+    productsToShow = [...productsToShow].sort(
+      (a, b) =>
+        (sort === "name-asc" ? 1 : -1) *
+        (language === "ar" ? a.name_ar : a.name).localeCompare(
+          language === "ar" ? b.name_ar : b.name,
+          language,
+        ),
     );
   else
     productsToShow = [...productsToShow].sort(

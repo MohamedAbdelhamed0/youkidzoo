@@ -6,11 +6,8 @@ export function ShopsPage() {
   const { ar, t } = useLanguage();
   const { shops, error, loading } = useShopDirectoryController();
   return (
-    <section>
-      <span className="eyebrow">
-        {t("LITTLE SHOPS, BIG HEARTS", "متاجر صغيرة، قلوب كبيرة")}
-      </span>
-      <h1>{t("Meet our shops", "اكتشف متاجرنا")}</h1>
+    <section className="store-page">
+      <h1>{t("Our shops", "متاجرنا")}</h1>
       {error && (
         <p role="alert">
           <ErrorText message={error} />
@@ -29,14 +26,28 @@ export function ShopsPage() {
                 {s.logoUrl ? <img src={s.logoUrl} alt="" /> : "🏡"}
               </div>
             )}
-            <h2>
-              {s.name[ar ? "ar" : "en"]} {s.isVerified && "✓"}
-            </h2>
-            <p>{s.description[ar ? "ar" : "en"]}</p>
-            <span>{t("Explore shop →", "اكتشف المتجر ←")}</span>
+            <div className="store-shop-copy">
+              <h2>
+                {s.name[ar ? "ar" : "en"]}{" "}
+                {s.isVerified && (
+                  <span role="img" aria-label={t("Verified", "متجر موثّق")}>
+                    ✓
+                  </span>
+                )}
+              </h2>
+              <p>{s.description[ar ? "ar" : "en"]}</p>
+              <span className="store-text-link">
+                {t("Explore shop", "اكتشف المتجر")}
+              </span>
+            </div>
           </Link>
         ))}
       </div>
+      {!shops.length && !error && !loading && (
+        <p>
+          {t("No shops available right now.", "لا توجد متاجر متاحة حاليًا.")}
+        </p>
+      )}
     </section>
   );
 }

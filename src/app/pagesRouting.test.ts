@@ -41,3 +41,12 @@ it("does not navigate to another origin or outside the repository path", () => {
     restore("https://example.github.io/youkidzoo/shop"),
   ).not.toHaveBeenCalled();
 });
+it.each([
+  "/youkidzoo/shop?q=airplane",
+  "/youkidzoo/products/10000000-0000-4000-8000-000000000001",
+])("restores the storefront deep link %s", (path) => {
+  const replace = restore(
+    `https://example.github.io/youkidzoo/?__youkidzoo_route=${encodeURIComponent(path)}`,
+  );
+  expect(replace).toHaveBeenCalledWith(null, "", path);
+});

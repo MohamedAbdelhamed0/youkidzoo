@@ -9,6 +9,7 @@ import type { IAdminDataSource } from "../features/admin/data/datasources/IAdmin
 import { OrderRepositoryImpl } from "../features/orders/data/OrderRepositoryImpl";
 import type { OrderDto } from "../features/orders/data/models";
 import type { IOrderDataSource } from "../features/orders/data/datasources/IOrderDataSource";
+import demo from "../shared/data/demo-data.json";
 const profile: ProfileDto = {
   id: "customer",
   username: "parent",
@@ -43,6 +44,24 @@ it("swaps the catalog source without React or Supabase and returns independent d
   expect(product.description.ar).toBe(dto.description_ar);
   product.galleryUrls.push("https://example.test/other.jpg");
   expect(dto.gallery_urls).toHaveLength(1);
+});
+it("provides one photographed demo product for every sample category", async () => {
+  const catalog = await new ProductRepositoryImpl(
+    new DemoProductDataSource(),
+  ).list();
+  const photographed = catalog.filter((product) =>
+    product.id.startsWith("demo-"),
+  );
+  expect(photographed).toHaveLength(demo.categories.length);
+  for (const category of demo.categories) {
+    expect(photographed).toContainEqual(
+      expect.objectContaining({
+        id: `demo-${category.slug}`,
+        categoryId: category.id,
+        thumbnailUrl: expect.stringContaining(`/${category.slug}.webp`),
+      }),
+    );
+  }
 });
 it("refuses inactive accounts at the repository boundary even when sign-in succeeds", async () => {
   const source = authSource();
